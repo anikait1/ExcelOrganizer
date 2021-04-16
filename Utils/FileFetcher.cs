@@ -1,4 +1,5 @@
-﻿using MusicExcelOrganizer.Models;
+﻿using ATL;
+using MusicExcelOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ namespace MusicExcelOrganizer.Utils
         {
             return Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
                             .Where(file => extensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
-                            .SelectSkipExceptions(file => new MusicFileInfo(TagLib.File.Create(file), new FileInfo(file)))
+                            .SelectSkipExceptions(file => new MusicFileInfo(new Track(file), new FileInfo(file)))
                             .ToArray();
         }
 
