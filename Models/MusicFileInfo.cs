@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ATL;
+using System;
 using System.IO;
 
 namespace MusicExcelOrganizer.Models
@@ -13,7 +14,7 @@ namespace MusicExcelOrganizer.Models
         public string Title { get; init; }
         public string Album { get; init; }
         public string Genre { get; init; }
-        public uint Year { get; init; }
+        public int Year { get; init; }
         public TimeSpan Length { get; init; }
         #endregion
 
@@ -30,21 +31,21 @@ namespace MusicExcelOrganizer.Models
         public DateTime DateModified { get; init; }
         #endregion
 
-        public MusicFileInfo(TagLib.File tfile, FileInfo fileInfo)
+        public MusicFileInfo(Track track, FileInfo fileInfo)
         {
-            Title = tfile.Tag.Title ?? fileInfo.Name;
-            Album = tfile.Tag.Album;
-            Genre = tfile.Tag.JoinedGenres;
-            Year = tfile.Tag.Year;
-            Length = tfile.Properties.Duration;
+            Title = string.IsNullOrEmpty(track.Title) || string.IsNullOrWhiteSpace(track.Title) ? fileInfo.Name : track.Title;
+            Album = track.Album;
+            Genre = track.Genre;
+            Year = track.Year;
+            Length = TimeSpan.FromMilliseconds(track.DurationMs);
 
-            ContributingArtists = tfile.Tag.JoinedPerformers;
-            AlbumArtists = tfile.Tag.JoinedAlbumArtists;
-            Composers = tfile.Tag.JoinedComposers;
+            ContributingArtists = track.Artist;
+            AlbumArtists = track.AlbumArtist;
+            Composers = track.Composer;
 
             Name = fileInfo.Name;
-            Path = tfile.Name;
-            Type = tfile.MimeType;
+            Path = fileInfo.FullName;
+            Type = track.AudioFormat.Name;
             DateModified = fileInfo.LastWriteTime;
         }
     }
