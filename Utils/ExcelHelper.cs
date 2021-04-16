@@ -64,8 +64,6 @@ namespace MusicExcelOrganizer.Utils
                 worksheet.Cell(row + i, col++).Value = musicFileInfos[i].Length;
                 worksheet.Cell(row + i, col++).Value = musicFileInfos[i].Type;
                 worksheet.Cell(row + i, col++).Value = musicFileInfos[i].Composers;
-
-
             }
         }
     }
