@@ -11,22 +11,25 @@ namespace MusicExcelOrganizer.Utils
     /// Responsible for handling of fetching the files from a given directory and its
     /// sub-directories
     /// </summary>
-    static class FileFetcher
+    public static class FileFetcher
     {
-        private static readonly HashSet<string> extensions = new() { ".mp3", ".wma", ".flac", ".m4a", ".aac" };
-
         /// <summary>
-        /// Iterate through given directory and sub directories, to fetch valid
-        /// files and convert them to MusicFileInfo.
+        /// Enumerate all the files in the given directory and its sub-directories and
+        /// only filter out the ones which belong to the given category.
         /// </summary>
-        /// <param name="directory">Directory to search for files.</param>
-        /// <returns>MusicFileInfo representation of valid files.</returns>
-        public static MusicFileInfo[] GetMusicFiles(string directory)
+        /// <param name="category">Category of files to filter</param>
+        /// <param name="directory">Directory to enumerate in</param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetFiles(string directory, HashSet<string> extensions)
         {
-            return Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
-                            .Where(file => extensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
-                            .SelectSkipExceptions(file => new MusicFileInfo(new Track(file), new FileInfo(file)))
-                            .ToArray();
+            IEnumerable<string> query = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories);
+
+            if (extensions.Count != 0)
+            {
+                query = query.Where(file => extensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase));
+            }
+
+            return query;
         }
 
 
@@ -36,26 +39,6 @@ namespace MusicExcelOrganizer.Utils
         /// <param name="values"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static IEnumerable<MusicFileInfo> SelectSkipExceptions(
-            this IEnumerable<string> values, 
-            Func<string, MusicFileInfo> selector)
-        {
-            foreach (var item in values)
-            {
-                MusicFileInfo output;
-                try
-                {
-                    Console.WriteLine($"Processing {item}");
-                    output = selector(item);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine($"Previous file is skipped. Error: {exception.Message}");
-                    continue;
-                }
-
-                yield return output;
-            }
-        }
+        /**/
     }
 }
