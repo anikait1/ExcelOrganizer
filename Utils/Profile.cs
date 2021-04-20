@@ -6,25 +6,25 @@ namespace MusicExcelOrganizer.Utils
 {
     public static class Profile
     {
-        private static readonly Dictionary<string, HashSet<string>> _extensionsByCategory = new()
+        private static readonly Dictionary<FileCategory, HashSet<string>> _extensionsByCategory = new()
         {
-            { "audio", new() { ".mp3", ".wma", ".flac", ".m4a", ".aac" } },
-            { "all", new() { } }
+            { FileCategory.audio, new() { ".mp3", ".wma", ".flac", ".m4a", ".aac" } },
+            { FileCategory.all, new() { } }
         };
 
-        private static readonly Dictionary<string, string[]> _titlesByCategory = new()
+        private static readonly Dictionary<FileCategory, string[]> _titlesByCategory = new()
         {
-            { "audio", new[] { "Name", "Title", "Contributing Artists", "Year", "Genre", "Album", "Path", "Album Artists", "Date Modified", "Length", "Type", "Composers" } },
-            { "all", new[] { "Name", "Path", "Type",  "Date Created", "Date Accessed", "Date Modified",  } }
+            { FileCategory.audio, new[] { "Name", "Title", "Contributing Artists", "Year", "Genre", "Album", "Path", "Album Artists", "Date Modified", "Length", "Type", "Composers" } },
+            { FileCategory.all, new[] { "Name", "Path", "Type", "Size", "Date Created", "Date Accessed", "Date Modified", } }
         };
 
-        private static readonly Dictionary<string, Func<string, IExcelSerializer>> _mappingByCategory = new()
+        private static readonly Dictionary<FileCategory, Func<string, IExcelSerializer>> _mappingByCategory = new()
         {
-            { "audio", (file) => new AudioFile(new ATL.Track(file), new System.IO.FileInfo(file)) },
-            { "all", (file) => new GeneralFile(new System.IO.FileInfo(file)) },
+            { FileCategory.audio, (file) => new AudioFile(new ATL.Track(file), new System.IO.FileInfo(file)) },
+            { FileCategory.all, (file) => new GeneralFile(new System.IO.FileInfo(file)) },
         };
 
-        public static (HashSet<string>, string[], Func<string, IExcelSerializer>) GetProfile(string category)
+        public static (HashSet<string>, string[], Func<string, IExcelSerializer>) GetProfile(FileCategory category)
         {
             return (_extensionsByCategory[category], 
                     _titlesByCategory[category], 
