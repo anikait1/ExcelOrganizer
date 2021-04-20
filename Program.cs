@@ -1,4 +1,5 @@
-﻿using MusicExcelOrganizer.Models;
+﻿using CommandLine;
+using MusicExcelOrganizer.Models;
 using MusicExcelOrganizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,19 +14,19 @@ namespace MusicExcelOrganizer
         {
             try
             {
-                string currentDirectory = Environment.CurrentDirectory;
-                currentDirectory = @"C:\Users\Anikait\Downloads";
-                string folderName = currentDirectory.Split('\\').Last();
-                string category = "all";
+                Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
+                {
+                    Console.WriteLine($"\nRunning with following configuration. Category: {options.Category}, Directory: {options.Directory}\n");
+                    
+                    string filename = options.Directory.Split('\\').Last();
+                    (HashSet<string> extensions, string[] titles, Func<string, IExcelSerializer> map) = Profile.GetProfile(options.Category);
 
-                var profile = Profile.GetProfile(category);
-                (HashSet<string> extensions, string[] titles, Func<string, IExcelSerializer> map) = Profile.GetProfile(category);
-
-                var data = FileFetcher.GetFiles(currentDirectory, extensions)
-                                      .SelectSkipExceptions(file => map(file))
-                                      .ToArray();
-
-                ExcelWriter.WriteToExcelFile(folderName, titles, data);
+                    IExcelSerializer[] data = FileFetcher.GetFiles(options.Directory, extensions)
+                                                         .SelectSkipExceptions(map)
+                                                         .ToArray();
+                    ExcelWriter.WriteToExcelFile(filename, titles, data);
+                    Console.WriteLine($"\nFile Saved: {Path.Combine(options.Directory, filename)}\n");
+                });
             } 
             catch (Exception exception)
             {
@@ -34,28 +35,4 @@ namespace MusicExcelOrganizer
         }
     }
 
-    static class LinqExtensions
-    {
-        public static IEnumerable<TResult> SelectSkipExceptions<TSource, TResult>(
-            this IEnumerable<TSource> values,
-            Func<TSource, TResult> selector)
-        {
-            foreach (var item in values)
-            {
-                TResult output;
-                try
-                {
-                    Console.WriteLine($"Processing {item}");
-                    output = selector(item);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine($"Previous file is skipped. Error: {exception.Message}");
-                    continue;
-                }
-
-                yield return output;
-            }
-        }
-    }
 }
