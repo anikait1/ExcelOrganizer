@@ -10,6 +10,7 @@ namespace MusicExcelOrganizer.Models
 {
     public class GeneralFile : IExcelSerializer
     {
+        #region File Properties
         public string Name { get; init; }
         public string Path { get; init; }
         public string Type { get; init; }
@@ -17,6 +18,7 @@ namespace MusicExcelOrganizer.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateAccessed { get; set; }
         public DateTime DateModified { get; init; }
+        #endregion
 
         public GeneralFile(FileInfo file)
         {
